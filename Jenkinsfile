@@ -5,18 +5,38 @@ pipeline {
         // Install the Maven version configured as "M3" and add it to the path.
         maven "Maven"
     }
-    
+
     stages {
+		stage ('Test'){
+			steps{
+				input 'Do you want to proceed?'
+			}
+		}
+	stage ('pre-build'){
+			parallel{
+				stage ('unittest'){
+					steps{
+						echo 'I am in Unit Testing Phase....'
+					}
+				}	
+				stage ('integrationtest'){
+					steps{
+						echo 'I am in Integration Testing Phase....'
+					}
+				}	
+			}
+		}
+	
         stage('Build') {
             steps {
                 // Get some code from a GitHub repository
                 git 'https://github.com/nevrekarsoundarya/bankapp.git'
-                env.PATH = env.PATH + ";C:\\Windows\\System32"
+
                 // Run Maven on a Unix agent.
-                // sh "mvn -Dmaven.test.failure.ignore=true clean package"
+                //sh "mvn -Dmaven.test.failure.ignore=true clean package"
 
                 // To run Maven on a Windows agent, use
-                bat "mvn -f Day1-BankApp\\pom.xml -Dmaven.test.failure.ignore=true clean package"
+                 bat "mvn -f Day1-BankApp\\pom.xml -Dmaven.test.failure.ignore=true clean package"
             }
 
             post {
